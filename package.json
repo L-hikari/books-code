@@ -1,0 +1,26 @@
+{
+  "name": "books-code",
+  "version": "1.0.0",
+  "description": "examples code for me readed books",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/L-hikari/books-code.git"
+  },
+  "keywords": [
+    "book",
+    "books",
+    "examples",
+    "examples code"
+  ],
+  "author": "L",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/L-hikari/books-code/issues"
+  },
+  "homepage": "https://github.com/L-hikari/books-code#readme"
+}
