@@ -1,3 +1,6 @@
+/**
+ * @file 策略模式
+ */
 import PerformanceA from "./performances/PerformanceA.js";
 import PerformanceB from "./performances/PerformanceB.js";
 
