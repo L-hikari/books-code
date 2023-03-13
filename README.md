@@ -4,4 +4,4 @@
 # 包含的书籍
 - WebGL 编程指南 [code](./webgl-examples)
 - Threejs 开发指南 [code](./learning-threejs)
-- JavaScript 设计模式与开发实践 [code](./javascript-design-pattren)
+- JavaScript 设计模式与开发实践 [code](./javascript-design-pattern)
