@@ -4,7 +4,16 @@
 
 <head>
     <title>Example 08.02 - Merge objects</title>
-    <script type="text/javascript" src="../libs/three.js"></script>
+    <!-- <script type="text/javascript" src="../libs/three.js"></script> -->
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+        <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.149.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.149.0/examples/jsm/"
+            }
+        }
+    </script>
 
     <script type="text/javascript" src="../libs/stats.js"></script>
     <script type="text/javascript" src="../libs/dat.gui.js"></script>
@@ -25,7 +34,9 @@
 </div>
 
 <!-- Javascript code that runs our Three.js examples -->
-<script type="text/javascript">
+<script type="module">
+    import * as THREE from 'three';
+    import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
     // once everything is loaded, we run our Three.js stuff.
     function init() {
@@ -41,7 +52,7 @@
         // create a render and set the size
         var renderer = new THREE.WebGLRenderer();
 
-        renderer.setClearColor(new THREE.Color(0x00000, 1.0));
+        renderer.setClearColor(new THREE.Color(0x00000));
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMapEnabled = true;
 
@@ -65,7 +76,7 @@
             this.combined = false;
 
 
-            this.numberOfObjects = 500;
+            this.numberOfObjects = 10;
 
             this.redraw = function () {
                 var toRemove = [];
@@ -76,19 +87,27 @@
                     scene.remove(e)
                 });
 
+                const cubeGeometry = new THREE.BoxGeometry();
                 // add a large number of cubes
                 if (controls.combined) {
-                    var geometry = new THREE.Geometry();
+                    const geos = [];
+                    // var geometry = new THREE.BufferGeometry();
                     for (var i = 0; i < controls.numberOfObjects; i++) {
-                        var cubeMesh = addcube();
+                        var cubeMesh = addcube(cubeGeometry);
+                        console.log(cubeMesh.geometry);
                         cubeMesh.updateMatrix();
-                        geometry.merge(cubeMesh.geometry, cubeMesh.matrix);
+                        geos.push(cubeMesh.geometry);
+                        
+                        // geometry.merge(cubeMesh.geometry, cubeMesh.matrix);
                     }
+                    // console.log(geos);
+                    const geometry = BufferGeometryUtils.mergeBufferGeometries(geos, true);
+                    // console.log(geometry);
                     scene.add(new THREE.Mesh(geometry, cubeMaterial));
 
                 } else {
                     for (var i = 0; i < controls.numberOfObjects; i++) {
-                        scene.add(controls.addCube());
+                        scene.add(controls.addCube(cubeGeometry));
                     }
                 }
             };
@@ -114,12 +133,12 @@
 
         var rotation = 0;
 
-        function addcube() {
+        function addcube(geometry) {
 
-            var cubeSize = 1.0;
-            var cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+            // var cubeSize = 1.0;
+            // var cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
 
-            var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            var cube = new THREE.Mesh(geometry, cubeMaterial);
             cube.castShadow = true;
 
             // position the cube randomly in the scene

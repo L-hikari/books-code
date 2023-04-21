@@ -42,7 +42,7 @@
 
         // create a render and set the size
         var webGLRenderer = new THREE.WebGLRenderer();
-        webGLRenderer.setClearColor(new THREE.Color(0x000000, 1.0));
+        webGLRenderer.setClearColor(new THREE.Color(0x000000));
         webGLRenderer.setSize(window.innerWidth, window.innerHeight);
 
         // position and point the camera to the center of the scene
@@ -66,15 +66,24 @@
             // var material = new THREE.PointCloudMaterial({size: 4, vertexColors: true, color: 0xffffff});
             var material = new THREE.PointsMaterial({size: 4, vertexColors: true, color: 0xffffff});
 
+            const positions = [];
+            const colors = [];
+            const color = new THREE.Color();
             for (var x = -5; x < 5; x++) {
                 for (var y = -5; y < 5; y++) {
-                    var particle = new THREE.Vector3(x * 10, y * 10, 0);
-                    geom.vertices.push(particle);
-                    geom.colors.push(new THREE.Color(Math.random() * 0x00ffff));
+                    positions.push(x * 10, y * 10 ,0);
+                    color.setHex (Math.random() * 0x00ffff);
+                    colors.push( color.r, color.g, color.b );
+                    // var particle = new THREE.Vector3(x * 10, y * 10, 0);
+                    // geom.vertices.push(particle);
+                    // geom.colors.push(new THREE.Color(Math.random() * 0x00ffff));
                 }
             }
+            console.log(color);
+            geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
-            var cloud = new THREE.PointCloud(geom, material);
+            var cloud = new THREE.Points(geom, material);
             scene.add(cloud);
         }
 
