@@ -129,6 +129,23 @@ function keydown(ev, gl, n, u_ProjMatrix, projMatrix, nf) {
 
 function draw(gl, n, u_ProjMatrix, projMatrix, nf) {
   // Specify the viewing volume
+  // 定义正射投影盒装可视空间
+  /**
+   * v0(-left,top) v1(right,top)
+   * v2(-left,-bottom) v2(right,-bottom)
+   * c: 视点
+   * 
+   *    v0--------v1
+   *    |     |    |
+   *    |     |    |
+   *    |-----c---—|
+   *    |     |    |
+   *    |     |    |
+   *    v2--------v3
+   * 
+   * */
+  // setOrtho(left, right, bottom, top, near, far);
+  // near < far;
   projMatrix.setOrtho(-1.0, 1.0, -1.0, 1.0, g_near, g_far);
 
   // Pass the projection matrix to u_ProjMatrix

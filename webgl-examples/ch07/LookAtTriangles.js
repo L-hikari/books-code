@@ -56,6 +56,9 @@ function main() {
 
   // Set the matrix to be used for to set the camera view
   var viewMatrix = new Matrix4();
+  // 前三个表示视点 中间三个表示观察目标点 后三个表示上方向默认y轴正方向
+  // webgl默认视图矩阵如下设置 -1可以是任意负数
+  // setLookAt(0, 0, 0, 0, 0, -1, 0, 1, 0);
   viewMatrix.setLookAt(0.20, 0.25, 0.25, 0, 0, 0, 0, 1, 0);
 
   // Set the view matrix
