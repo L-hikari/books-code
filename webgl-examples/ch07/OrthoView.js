@@ -135,6 +135,7 @@ function draw(gl, n, u_ProjMatrix, projMatrix, nf) {
    * v2(-left,-bottom) v2(right,-bottom)
    * c: 视点
    * 
+   * 近裁剪面
    *    v0--------v1
    *    |     |    |
    *    |     |    |
