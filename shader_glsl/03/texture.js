@@ -1,8 +1,8 @@
 const baseUrl = '/shader_glsl/03';
 
 async function loadShaderFile() {
-  let vShader = await fetch(baseUrl + '/uv_passthrough.vert');
-  let fShader = await fetch(baseUrl + '/uv_vis.frag');
+  let vShader = await fetch(baseUrl + '/scrolling_uv.vert');
+  let fShader = await fetch(baseUrl + '/texture.frag');
 
   vShader = await vShader.text();
   fShader = await fShader.text();
@@ -42,10 +42,10 @@ function main(VSHADER_SOURCE, FSHADER_SOURCE) {
 function initVertexBuffers(gl) {
   var verticesTexCoords = new Float32Array([
     // Vertex coordinates, texture coordinate
-    -0.5,  0.5,   0.0, 1.0,
-    -0.5, -0.5,   0.0, 0.0,
-     0.5,  0.5,   1.0, 1.0,
-     0.5, -0.5,   1.0, 0.0,
+    -1.0,  1.0,   0.0, 1.0,
+    -1.0, -1.0,   0.0, 0.0,
+     1.0,  1.0,   1.0, 1.0,
+     1.0, -1.0,   1.0, 0.0,
   ]);
 
   var n = 4; // The number of vertices
@@ -100,6 +100,12 @@ function initTextures(gl, n) {
     return false;
   }
 
+  const u_time = gl.getUniformLocation(gl.program, 'u_time');
+  if (!u_time) {
+    console.log('Failed to get the storage location of u_time');
+    return false;
+  }
+
   const image = new Image();
   image.src = '../../webgl-examples/resources/sky.jpg';
   image.onload = function() {
@@ -109,14 +115,21 @@ function initTextures(gl, n) {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
 
     gl.uniform1i(u_ParrotTex, 0);
-    // Clear <canvas>
-    gl.clear(gl.COLOR_BUFFER_BIT);
 
-    // Draw the rectangle
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
+    setInterval(function() {
+      const second = (new Date()).getSeconds();
+      gl.uniform1f(u_time, second * 0.01);
+          // Clear <canvas>
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      // Draw the rectangle
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
+    }, 300);
+
   }
 
   // return textureUnit;
