@@ -2,7 +2,7 @@ const baseUrl = '/shader_glsl/03';
 
 async function loadShaderFile() {
   let vShader = await fetch(baseUrl + '/texture.vert');
-  let fShader = await fetch(baseUrl + '/texture.frag');
+  let fShader = await fetch(baseUrl + '/brightness.frag');
 
   vShader = await vShader.text();
   fShader = await fShader.text();
@@ -100,8 +100,14 @@ function initTextures(gl, n) {
     return false;
   }
 
+  const u_brightness = gl.getUniformLocation(gl.program, 'u_brightness');
+  if (!u_brightness) {
+    console.log('Failed to get the storage location of u_brightness');
+    return false;
+  }
+
   const image = new Image();
-  image.src = './assets/1.png';
+  image.src = '../../webgl-examples/resources/sky.jpg';
   image.onload = function() {
 
     // 不通过webgl反转图片，在顶点着色器处理
@@ -110,9 +116,11 @@ function initTextures(gl, n) {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
 
     gl.uniform1i(u_ParrotTex, 0);
+    gl.uniform1f(u_brightness, 0.8);
+
 	// Clear <canvas>
 	gl.clear(gl.COLOR_BUFFER_BIT);
 

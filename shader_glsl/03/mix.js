@@ -2,7 +2,7 @@ const baseUrl = '/shader_glsl/03';
 
 async function loadShaderFile() {
   let vShader = await fetch(baseUrl + '/texture.vert');
-  let fShader = await fetch(baseUrl + '/texture.frag');
+  let fShader = await fetch(baseUrl + '/mix.frag');
 
   vShader = await vShader.text();
   fShader = await fShader.text();
@@ -87,12 +87,8 @@ function initVertexBuffers(gl) {
   return n;
 }
 
+let loadedCount = 0;
 function initTextures(gl, n) {
-  const texture = gl.createTexture();
-  if (!texture) {
-    console.log('Failed to create the texture object');
-    return false;
-  }
 
   const u_ParrotTex = gl.getUniformLocation(gl.program, 'u_ParrotTex');
   if (!u_ParrotTex) {
@@ -100,26 +96,69 @@ function initTextures(gl, n) {
     return false;
   }
 
+  const u_flowerTex = gl.getUniformLocation(gl.program, 'u_flowerTex');
+  if (!u_flowerTex) {
+    console.log('Failed to get the storage location of u_flowerTex');
+    return false;
+  }
+
   const image = new Image();
-  image.src = './assets/1.png';
+  image.src = './assets/parrot.png';
+
+  const image2 = new Image();
+	image2.src = './assets/checker.jpg';
+
   image.onload = function() {
+  	loadedCount++;
+  	onImagesLoaded(gl, image, image2, u_ParrotTex, u_flowerTex, n);
+  }
 
-    // 不通过webgl反转图片，在顶点着色器处理
-    // gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+	image2.onload = function() {
+		loadedCount++;
+		onImagesLoaded(gl, image, image2, u_ParrotTex, u_flowerTex, n);
+	}
+  // return textureUnit;
+}
 
-    gl.uniform1i(u_ParrotTex, 0);
+
+function onImagesLoaded(gl, image, image2, u_ParrotTex, u_flowerTex, n) {
+	if (loadedCount < 2) {
+		return;
+	}
+
+	const texture = gl.createTexture();
+  if (!texture) {
+    console.log('Failed to create the texture object');
+    return false;
+  }
+
+  const texture2 = gl.createTexture();
+  if (!texture2) {
+    console.log('Failed to create the texture2 object');
+    return false;
+  }
+
+	// 不通过webgl反转图片，在顶点着色器处理
+  // gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, texture2);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image2);
+
+  gl.uniform1i(u_ParrotTex, 0);
+  gl.uniform1i(u_flowerTex, 1);
 	// Clear <canvas>
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 	// Draw the rectangle
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
 
-  }
-
-  // return textureUnit;
 }
+
+
