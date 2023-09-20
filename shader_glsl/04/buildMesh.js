@@ -27,7 +27,7 @@ function buildMesh(w, h, pos) {
 			uvs[uvIdx], uvs[uvIdx + 1]
 		);
 	}
-
+	console.log(JSON.stringify(verticesTexCoords));
 	return new Float32Array(verticesTexCoords);
 	// return new Float32Array([
 	// 	-1,1,	0,1,
