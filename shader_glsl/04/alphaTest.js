@@ -53,6 +53,24 @@ function main(VSHADER_SOURCE, FSHADER_SOURCE) {
     return false;
   }
 
+  const u_cloud = gl.getUniformLocation(gl.program, 'u_cloud');
+  if (!u_cloud) {
+    console.log('Failed to get the storage location of u_cloud');
+    return false;
+  }
+  
+  const u_sun = gl.getUniformLocation(gl.program, 'u_sun');
+  if (!u_sun) {
+    console.log('Failed to get the storage location of u_sun');
+    return false;
+  }
+
+  const u_currentTexNum = gl.getUniformLocation(gl.program, 'u_currentTexNum');
+  if (!u_currentTexNum) {
+    console.log('Failed to get the storage location of u_currentTexNum');
+    return false;
+  }
+
   const p1 = new Promise((resolve, reject) => {
     const image1 = new Image();
     image1.src = './assets/forest.png';
@@ -68,16 +86,37 @@ function main(VSHADER_SOURCE, FSHADER_SOURCE) {
       resolve(image2);
     };
   });
+
+  const p3 = new Promise((resolve, reject) => {
+    const image3 = new Image();
+    image3.src = './assets/cloud.png';
+    image3.onload = function () {
+      const image_ = makePowerOfTwo(image3);
+      resolve(image_);
+    }
+  });
+
+  const p4 = new Promise((resolve, reject) => {
+    const image4 = new Image();
+    image4.src = './assets/sun.png';
+    image4.onload = function () {
+      const image_ = makePowerOfTwo(image4);
+      resolve(image_);
+    }
+  });
   
-  Promise.all([p1, p2])
-  .then(([image1, image2]) => {
+  Promise.all([p1, p2, p3, p4])
+  .then(([image1, image2, image3, image4]) => {
+    
     // initArrayBuffer(gl, image1, image2);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
   
     // Clear <canvas>
     gl.clear(gl.COLOR_BUFFER_BIT);
-  
-    const forestVerticesTexCoords = new Float32Array([
+
+    gl.enable(gl.BLEND);
+
+    const verticesTexs = new Float32Array([
       // forest
       -1, 1, -0.5, 0, 1,
       -1, -1, -0.5, 0, 0,
@@ -85,8 +124,13 @@ function main(VSHADER_SOURCE, FSHADER_SOURCE) {
       -1, -1, -0.5, 0, 0,
       1, -1, -0.5, 1, 0,
       1, 1, -0.5, 1, 1,
-    ]);
-    const greenManVerticesTexCoords = new Float32Array([
+      // sun
+      -1.0, 1.0, -0.8, 0, 1,
+      -1.0, -1.0, -0.8, 0, 0,
+      1.0, 1.0, -0.8, 1, 1,
+      -1.0, -1.0, -0.8, 0, 0,
+      1.0, -1.0, -0.8, 1, 0,
+      1.0, 1.0, -0.8, 1, 1,
       // green man
       -0.25, 0, 0, 0, 1,
       -0.25, -0.5, 0, 0, 0,
@@ -94,14 +138,36 @@ function main(VSHADER_SOURCE, FSHADER_SOURCE) {
       -0.25, -0.5, 0, 0, 0,
       0.25, -0.5, 0, 1, 0,
       0.25, 0, 0, 1, 1,
+      // cloud
+      -0.9, 0.9, 0, 0, 1,
+      -0.9, 0.5, 0, 0, 0,
+      -0.5, 0.9, 0, 1, 1,
+      -0.9, 0.5, 0, 0, 0,
+      -0.5, 0.5, 0, 1, 0,
+      -0.5, 0.9, 0, 1, 1,
     ]);
-    bindBufferData(gl, forestVerticesTexCoords, pos, uv);
+
+    bindBufferData(gl, verticesTexs, pos, uv);
+
     bindTextureImage(gl, forest, image1, 0);
+    gl.uniform1i(u_currentTexNum, 0);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-    bindBufferData(gl, greenManVerticesTexCoords, pos, uv);
+    // 太阳光设置加法混合
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+    bindTextureImage(gl, u_sun, image4, 3);
+    gl.uniform1i(u_currentTexNum, 3);
+    gl.drawArrays(gl.TRIANGLES, 6, 6);
+
+    // 其余设置alpha混合
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     bindTextureImage(gl, greenMan, image2, 1);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.uniform1i(u_currentTexNum, 1);
+    gl.drawArrays(gl.TRIANGLES, 12, 6);
+
+    bindTextureImage(gl, u_cloud, image3, 2);
+    gl.uniform1i(u_currentTexNum, 2);
+    gl.drawArrays(gl.TRIANGLES, 18, 6);
   });
 
 }
@@ -154,7 +220,12 @@ function bindTextureImage(gl, sampler, image, unit) {
     case 1:
       gl.activeTexture(gl.TEXTURE1);
       break;
-  
+    case 2:
+      gl.activeTexture(gl.TEXTURE2);
+      break;
+    case 3:
+      gl.activeTexture(gl.TEXTURE3);
+      break;
     default:
       break;
   }
