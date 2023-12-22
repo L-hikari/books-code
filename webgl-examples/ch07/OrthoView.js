@@ -132,8 +132,8 @@ function draw(gl, n, u_ProjMatrix, projMatrix, nf) {
   // 定义正射投影盒装可视空间
   /**
    * v0(-left,top) v1(right,top)
-   * v2(-left,-bottom) v2(right,-bottom)
-   * c: 视点
+   * v2(-left,-bottom) v3(right,-bottom)
+   * c: 视点(0, 0)
    * 
    * 近裁剪面
    *    v0--------v1
