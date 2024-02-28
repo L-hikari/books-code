@@ -155,9 +155,17 @@ function main([VSHADER_SOURCE, FSHADER_SOURCE]) {
 
     const {mat4, vec3} = glMatrix;
     const matrix = mat4.create();
-    mat4.scale(matrix, matrix, vec3.fromValues(0.5, 0.5, 1));
-    mat4.translate(matrix, matrix, vec3.fromValues(-0.5, 0, 0));
-    mat4.rotate(matrix, matrix, 3 * Math.PI / 2, vec3.fromValues(0, 0, 1));
+    const translateMatrix = mat4.create();
+    const rotateMatrix = mat4.create();
+
+    mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(-0.5, 0, 0));
+    mat4.rotate(rotateMatrix, rotateMatrix, Math.PI / 6, vec3.fromValues(0, 0, 1));
+    // mat4.multiply(matrix, translateMatrix, rotateMatrix);
+    mat4.multiply(matrix, rotateMatrix, translateMatrix);
+
+    // mat4.scale(matrix, matrix, vec3.fromValues(0.5, 0.5, 1));
+    // mat4.translate(matrix, matrix, vec3.fromValues(-0.5, 0, 0));
+    // mat4.rotate(matrix, matrix, Math.PI / 6, vec3.fromValues(0, 0, 1));
 
     bindBufferData(gl, verticesTexs, pos, uv);
 
