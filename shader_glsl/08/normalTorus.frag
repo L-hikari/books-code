@@ -6,11 +6,10 @@ uniform vec3 u_lightDirection;
 uniform vec3 u_lightColor;
 uniform vec3 u_meshColor;
 
-varying vec3 v_uv;
 varying vec3 v_normal;
 
 void main() {
-    // gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    // <漫反射光颜色> = <入射光颜色> * <表面基底色> * dot(<光线方向> * <法线方向>)
     vec3 normal = normalize(v_normal);
     float lightAmt = max(dot(normal, u_lightDirection), 0.0);
     vec3 fragLight = u_lightColor * lightAmt;
